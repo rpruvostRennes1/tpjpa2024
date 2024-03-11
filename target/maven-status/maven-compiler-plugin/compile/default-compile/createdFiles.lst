@@ -1,0 +1,7 @@
+jpa\rest\SwaggerResource.class
+jpa\dao\generic\EntityManagerHelper.class
+jpa\servlet\MyServlet.class
+jpa\servlet\RestApplication.class
+jpa\servlet\UserInfo.class
+jpa\rest\TicketResource.class
+jpa\RestServer.class

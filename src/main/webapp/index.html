@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World</title>
+
+    <!-- Include Swagger UI CSS -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@3/swagger-ui.css" />
+
+    <!-- Include Swagger UI JS -->
+    <script src="https://unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+</head>
+<body>
+<h1>Hello World</h1>
+
+<!-- Swagger UI will be rendered in this div -->
+<div id="swagger-ui"></div>
+
+<script>
+    // Initialize Swagger UI
+    const ui = SwaggerUIBundle({
+        url: "http://localhost:8080/openapi.json",
+        dom_id: '#swagger-ui',
+        presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIBundle.SwaggerUIStandalonePreset
+        ]
+    })
+</script>
+</body>
+</html>
