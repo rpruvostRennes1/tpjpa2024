@@ -41,7 +41,7 @@ public class Ticket {
         this.date = date;
         this.titre = titre;
         this.demande = demande;
-        if (discussion) {
+        if (Boolean.TRUE.equals(discussion)) {
             this.discussion = new Discussion();
         }
     }
