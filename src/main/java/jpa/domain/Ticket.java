@@ -44,6 +44,7 @@ public class Ticket {
         if (Boolean.TRUE.equals(discussion)) {
             this.discussion = new Discussion();
         }
+        this.statut = Statut.OPEN;
     }
 
     public void setId(Long id) {

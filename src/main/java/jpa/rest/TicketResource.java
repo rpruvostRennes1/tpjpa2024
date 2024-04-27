@@ -2,10 +2,15 @@ package jpa.rest;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jpa.dao.generic.EntityManagerHelper;
 import jpa.domain.Ticket;
+import jpa.domain.Utilisateur;
+
+import java.util.List;
 
 
 @Path("/ticket")
@@ -23,42 +28,50 @@ public class TicketResource {
         Ticket[] tickets = manager.createQuery("Select a From Ticket a", Ticket.class).getResultList().toArray(new Ticket[0]);
         tx.commit();
         return Response.ok(tickets)
-                .header("Access-Control-Allow-Origin", "http://localhost:4200")
                 .build();
     }
     // Get ticket by id
     @GET
     @Path("/{ticketId}")
-    public Ticket getTicket(@PathParam("ticketId") String ticketId)  {
-        // Start the entity manager
+    public Response getTicket(@PathParam("ticketId") String ticketId)  {
         EntityManager manager = EntityManagerHelper.getEntityManager();
-
         EntityTransaction tx = manager.getTransaction();
         tx.begin();
-        // Get the ticket by id using a query
-        Ticket ticket = manager.createQuery("Select a From Ticket a where a.id = " + ticketId, Ticket.class).getSingleResult();
+
+        Ticket ticket = null;
+        try {
+            ticket = manager.createQuery("Select a From Ticket a where a.id = " + ticketId, Ticket.class).getSingleResult();
+        } catch (NoResultException e) {
+            tx.rollback();
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
         tx.commit();
-        return ticket;
+        return Response.ok(ticket).build();
     }
     // Add another path to adding a ticket
     @POST
     @Path("/add")
     public Response addTicket(Ticket ticket)  {
-        // Start the entity manager
         EntityManager manager = EntityManagerHelper.getEntityManager();
-
         EntityTransaction tx = manager.getTransaction();
         tx.begin();
-        // If the username is not in the database, create a new user
+
+        String username = ticket.getAuteur().getUsername();
+        TypedQuery<Utilisateur> query = manager.createQuery("Select a From Utilisateur a where a.username = :username", Utilisateur.class);
+        query.setParameter("username", username);
+        List<Utilisateur> users = query.getResultList();
+
+        if (users.isEmpty()) {
+            manager.persist(ticket.getAuteur());
+        } else {
+            ticket.setAuteur(users.get(0));
+        }
+
         manager.persist(ticket);
         tx.commit();
-        manager.close();
 
-
-        return Response.ok(ticket)
-                .header("Access-Control-Allow-Origin", "http://localhost:4200")
-                .header("Access-Control-Allow-Methods", "POST, GET, PUT, UPDATE, OPTIONS")
-                .header("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With")
-                .build();
+        return Response.ok(ticket).build();
     }
+
 }

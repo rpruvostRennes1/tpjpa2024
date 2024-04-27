@@ -3,6 +3,7 @@ package jpa.servlet;
 import java.util.HashSet;
 import java.util.Set;
 
+import jpa.rest.CorsFilter;
 import jpa.rest.SwaggerResource;
 import jpa.rest.TicketResource;
 
@@ -17,12 +18,14 @@ public class RestApplication extends Application {
     public Set<Class<?>> getClasses() {
         final Set<Class<?>> resources = new HashSet<>();
 
-
         // SWAGGER endpoints
         resources.add(OpenApiResource.class);
 
         //Your own resources.
         resources.add(TicketResource.class);
+
+        // Add CorsFilter
+        resources.add(CorsFilter.class);
 
         resources.add(SwaggerResource.class);
         return resources;
