@@ -74,4 +74,36 @@ public class TicketResource {
         return Response.ok(ticket).build();
     }
 
+    // Update ticket
+    @PUT
+    @Path("/update/{ticketId}")
+    public Response updateTicket(@PathParam("ticketId") String ticketId, Ticket updatedTicket) {
+        EntityManager manager = EntityManagerHelper.getEntityManager();
+        EntityTransaction tx = manager.getTransaction();
+        tx.begin();
+
+        Ticket existingTicket = null;
+        try {
+            existingTicket = manager.createQuery("Select a From Ticket a where a.id = " + ticketId, Ticket.class).getSingleResult();
+        } catch (NoResultException e) {
+            tx.rollback();
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        // Update the existing ticket with the new values
+        existingTicket.setTitre(updatedTicket.getTitre());
+        existingTicket.setTags(updatedTicket.getTags());
+        existingTicket.setStatut(updatedTicket.getStatut());
+
+        if (existingTicket.getDiscussion() != null) {
+            existingTicket.setDiscussion(manager.merge(existingTicket.getDiscussion()));
+        }
+
+        existingTicket = manager.merge(existingTicket); // Merge the detached entity back into the current session
+        manager.persist(existingTicket);
+        tx.commit();
+
+        return Response.ok(existingTicket).build();
+    }
+
 }
